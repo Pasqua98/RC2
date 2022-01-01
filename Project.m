@@ -283,20 +283,22 @@ R_oa_out = 10 + R_oa_in;            % Radius within the flock stays in
 c_la = 20;   
 
 % Flocking force
-c_fl = 5;
+c_fl = 9;
 
-% Collision avoidancde force
+% Collision avoidance force
 
-c_ca = 1;                          % Regulates force magnitude
-w_ca = 6;                           % Regulates force decay
+c_ca = 2;                          % Regulates force magnitude
+w_ca = 3;                           % Regulates force decay
 R_ca = 3;                           % Radius within this force increases exponentially
 Rn = 5;                            % Radius of detection
 
 % Grouping force
 c_g = 1;
 R_to = 2;
-R_ti = 3;
+R_ti = 4;
 R_pc = 20;
+
+k_cm_ref = 10;
 
 
 %% Simulation
@@ -306,28 +308,40 @@ flock = sim("unicycle_control_template_R2018a_flocking.slx");
 %% Graphs
 figure;
 hold on;
-ugv1 = plot(flock.q_1.signals(1).values(1,1,1),flock.q_1.signals(1).values(1,2,1),'o','MarkerFaceColor','red',"MarkerEdgeColor","red");
-ugv2 = plot(flock.q_2.signals(1).values(1,1,1),flock.q_2.signals(1).values(1,2,1),'o','MarkerFaceColor','blue',"MarkerEdgeColor","blue");
-com = plot(flock.p_com.signals.values(1,1,1),flock.p_com.signals.values(2,1,1),"*","LineWidth",1,"Color",[0.5 0 0.8]);
+ugv1 = plot(flock.q_1.signals(1).values(1,1,1),flock.q_1.signals(1).values(1,2,1),'o','MarkerFaceColor','#e85d04',"MarkerEdgeColor","#e85d04");
+ugv2 = plot(flock.q_2.signals(1).values(1,1,1),flock.q_2.signals(1).values(1,2,1),'o','MarkerFaceColor','#9d0208',"MarkerEdgeColor","#9d0208");
+ugv3 = plot(flock.q_3.signals(1).values(1,1,1),flock.q_3.signals(1).values(1,2,1),'o','MarkerFaceColor',"#ffba08","MarkerEdgeColor","#ffba08");
+ugv4 = plot(flock.q_4.signals(1).values(1,1,1),flock.q_4.signals(1).values(1,2,1),'o','MarkerFaceColor','#ef476f',"MarkerEdgeColor","#ef476f");
+ugv5 = plot(flock.q_5.signals(1).values(1,1,1),flock.q_5.signals(1).values(1,2,1),'o','MarkerFaceColor',"#06d6a0","MarkerEdgeColor","#06d6a0");
+com = plot(flock.p_com.signals.values(1,1,1),flock.p_com.signals.values(2,1,1),"*","LineWidth",1,"Color","#264653");
 for k=2:length(flock.q_1.time)
 
     com.XData = flock.p_com.signals.values(1,1,k);
     com.YData = flock.p_com.signals.values(2,1,k);
 
-    plot(flock.q_1.signals(1).values(1:k,1,1),flock.q_1.signals(1).values(1:k,2,1),"r-","LineWidth",0.2);
-    plot(flock.q_2.signals(1).values(1:k,1,1),flock.q_2.signals(1).values(1:k,2,1),"b-","LineWidth",0.2);
+    plot(flock.q_1.signals(1).values(1:k,1,1),flock.q_1.signals(1).values(1:k,2,1),"-","Color","#e85d04","LineWidth",0.2);
+    plot(flock.q_2.signals(1).values(1:k,1,1),flock.q_2.signals(1).values(1:k,2,1),"-","Color","#9d0208","LineWidth",0.2);
+    plot(flock.q_3.signals(1).values(1:k,1,1),flock.q_3.signals(1).values(1:k,2,1),"-","Color","#ffba08","LineWidth",0.2);
+    plot(flock.q_4.signals(1).values(1:k,1,1),flock.q_4.signals(1).values(1:k,2,1),"-","Color","#ef476f","LineWidth",0.2);
+    plot(flock.q_5.signals(1).values(1:k,1,1),flock.q_5.signals(1).values(1:k,2,1),"-","Color","#06d6a0","LineWidth",0.2);
     
     ugv1.XData = flock.q_1.signals(1).values(k,1,1);
     ugv1.YData = flock.q_1.signals(1).values(k,2,1);
     ugv2.XData = flock.q_2.signals(1).values(k,1,1);
     ugv2.YData = flock.q_2.signals(1).values(k,2,1);
+    ugv3.XData = flock.q_3.signals(1).values(k,1,1);
+    ugv3.YData = flock.q_3.signals(1).values(k,2,1);
+    ugv4.XData = flock.q_4.signals(1).values(k,1,1);
+    ugv4.YData = flock.q_4.signals(1).values(k,2,1);
+    ugv5.XData = flock.q_5.signals(1).values(k,1,1);
+    ugv5.YData = flock.q_5.signals(1).values(k,2,1);
    
     uistack(ugv1,'top');
     uistack(ugv2,'top');
     uistack(com,'top');
     drawnow
-    xlim([-2,6]);
-    ylim([-1,4]);
+    xlim([0,10]);
+    ylim([0,8]);
     pause(0.1);
 end
 
