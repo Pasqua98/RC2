@@ -247,3 +247,102 @@ zlim([0,7]);
 xlabel("x");
 ylabel("y");
 zlabel("z");
+
+%% UGV Flocking-like control 
+
+ic = [1,1,pi/2;
+      5,3, pi/3;
+      8,4, pi/3;
+      3,2, pi/4;
+      0,6, pi/6];
+
+% Constants used for modeling the agent
+ugv_L = 2;                              % agent's length
+v_max = 0.8*25;                     % maximum linear velocity
+w_max = 3 * pi;                     % maximum angular velocity
+E_0 = 20000;                        % Initial energy (Battery Level?)
+c_E = 1;                            % Constant related to agent's mass (E decay) 
+% Control signal apparent forces constants
+
+% f_i_pa "Predator Avoidance Force"
+c_pa = 300;                         % Regulate force magnitude
+w_pa = 2;                           % Regulate force's gradient magnitude
+R_pa = 10;                          % Radius of danger (forces rapidly increases within it)
+R_d = 30;                           % Predator's detection radius
+
+% Obstacle related force 
+
+% Obstacle avoidance
+c_oa = 1200;                        % Regulates force magnitude 
+w_oa = 8;                           % Regulates force decay rate
+R_oa_in = 2;                        % Radius within the repulsion force increases exponentially
+R_oa = 1.3 * R_oa_in;               % Radius of detection of the object
+R_oa_out = 10 + R_oa_in;            % Radius within the flock stays in 
+
+% Line avoidance force (non implemented)
+c_la = 20;   
+
+% Flocking force
+c_fl = 5;
+
+% Collision avoidancde force
+
+c_ca = 1;                          % Regulates force magnitude
+w_ca = 6;                           % Regulates force decay
+R_ca = 3;                           % Radius within this force increases exponentially
+Rn = 5;                            % Radius of detection
+
+% Grouping force
+c_g = 1;
+R_to = 2;
+R_ti = 3;
+R_pc = 20;
+
+
+%% Simulation
+
+flock = sim("unicycle_control_template_R2018a_flocking.slx");
+
+%% Graphs
+figure;
+hold on;
+ugv1 = plot(flock.q_1.signals(1).values(1,1,1),flock.q_1.signals(1).values(1,2,1),'o','MarkerFaceColor','red',"MarkerEdgeColor","red");
+ugv2 = plot(flock.q_2.signals(1).values(1,1,1),flock.q_2.signals(1).values(1,2,1),'o','MarkerFaceColor','blue',"MarkerEdgeColor","blue");
+com = plot(flock.p_com.signals.values(1,1,1),flock.p_com.signals.values(2,1,1),"*","LineWidth",1,"Color",[0.5 0 0.8]);
+for k=2:length(flock.q_1.time)
+
+    com.XData = flock.p_com.signals.values(1,1,k);
+    com.YData = flock.p_com.signals.values(2,1,k);
+
+    plot(flock.q_1.signals(1).values(1:k,1,1),flock.q_1.signals(1).values(1:k,2,1),"r-","LineWidth",0.2);
+    plot(flock.q_2.signals(1).values(1:k,1,1),flock.q_2.signals(1).values(1:k,2,1),"b-","LineWidth",0.2);
+    
+    ugv1.XData = flock.q_1.signals(1).values(k,1,1);
+    ugv1.YData = flock.q_1.signals(1).values(k,2,1);
+    ugv2.XData = flock.q_2.signals(1).values(k,1,1);
+    ugv2.YData = flock.q_2.signals(1).values(k,2,1);
+   
+    uistack(ugv1,'top');
+    uistack(ugv2,'top');
+    uistack(com,'top');
+    drawnow
+    xlim([-2,6]);
+    ylim([-1,4]);
+    pause(0.1);
+end
+
+% plot(flock.p_com.signals.values(1,1,1),flock.p_com.signals.values(2,1,1),"LineStyle","-.","Marker","x");
+% hold all;
+% pause(0.5);
+% plot(flock.p_com.signals.values(1,1,2),flock.p_com.signals.values(2,1,2),"LineStyle","-.","Marker","x");
+% hold all;
+% pause(0.5);
+% plot(flock.p_com.signals.values(1,1,3),flock.p_com.signals.values(2,1,3),"LineStyle","-.","Marker","x");
+% hold all;
+% pause(0.5);
+% plot(flock.p_com.signals.values(1,1,4),flock.p_com.signals.values(2,1,4),"LineStyle","-.","Marker","x");
+% hold all;
+% pause(0.5);
+% plot(flock.p_com.signals.values(1,1,5),flock.p_com.signals.values(2,1,5),"LineStyle","-.","Marker","x");
+% hold all;
+% pause(0.5);
